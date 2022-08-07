@@ -1,0 +1,12 @@
+import sys
+from PyQt5.QtWidgets import QApplication,QWidget, QPushButton
+
+def btn_clicked():
+    print("hello world")
+
+app = QApplication(sys.argv)
+btn = QPushButton("click_me")
+btn.clicked.connect(btn_clicked)
+btn.show()
+
+app.exec_()
