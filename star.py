@@ -1,5 +1,13 @@
 import sys
 entirePattern =["*","* *","*****"]
+dict = {0:1,1:1}
+
+def fabonich(n):
+    if(n<0): return print("index error")
+    elif(n in dict.keys()): return dict[n]
+    else:
+        dict[n] = fabonich(n-1) + fabonich(n-2)
+        return dict[n]
 
 def nulString(n):
     nul = ""
@@ -21,5 +29,5 @@ def starPrint(n):
     for i in range(0,n):
         print(nulString(n-1-i)+entirePattern[i]+"\n")
 
-starPrint(24)
+starPrint(96)
 
