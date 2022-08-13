@@ -2,6 +2,13 @@ import sys
 entirePattern =["*","* *","*****"]
 dict = {0:1,1:1}
 
+def check_same_element(s1,s2):
+    if len(s1) != len(s2):
+        return False
+    if len(set(s1) - set(s2)) == 0:
+        return True
+    return False
+
 def fabonich(n):
     if(n<0): return print("index error")
     elif(n in dict.keys()): return dict[n]
