@@ -25,7 +25,7 @@ def add_in_list(n, d, l, path):
 
 def devide_integer(n, min_v, max_v, path, l, d):
     if n in d:
-        add_in_list(n, d, l, path)
+        add_in_list(n, d[n], l, path)
         return l
     if n == 0:
         l.append(path)
@@ -40,15 +40,7 @@ def devide_integer(n, min_v, max_v, path, l, d):
         devide_integer(n - x, min_v, max_v, str(x), n_l, d)
 
     d[n] = n_l
-    for x in n_l:
-        new_path = path + " " + x
-        check = False
-        for y in l:
-            if check_same_element(new_path.split(" "), y.split(" ")):
-                check = True
-                break
-        if not check:
-            l.append(new_path)
+    add_in_list(n, n_l, l, path)
     return l
 
 
