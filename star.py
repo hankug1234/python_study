@@ -2,12 +2,61 @@ import sys
 entirePattern =["*","* *","*****"]
 dict = {0:1,1:1}
 
-def check_same_element(s1,s2):
+
+def check_same_element(s1, s2):
     if len(s1) != len(s2):
         return False
     if len(set(s1) - set(s2)) == 0:
         return True
     return False
+
+
+def add_in_list(n, d, l, path):
+    for x in d[n]:
+        new_path = path + " " + x
+        check = False
+        for y in l:
+            if check_same_element(new_path.split(" "), y.split(" ")):
+                check = True
+                break
+        if not check:
+            l.append(new_path)
+
+
+def devide_integer(n, min_v, max_v, path, l, d):
+    if n in d:
+        add_in_list(n, d, l, path)
+        return l
+    if n == 0:
+        l.append(path)
+        return l
+    if n < min_v:
+        return l
+
+    n_l = []
+    if n < max_v:
+        max_v = n
+    for x in range(min_v, max_v + 1):
+        devide_integer(n - x, min_v, max_v, str(x), n_l, d)
+
+    d[n] = n_l
+    for x in n_l:
+        new_path = path + " " + x
+        check = False
+        for y in l:
+            if check_same_element(new_path.split(" "), y.split(" ")):
+                check = True
+                break
+        if not check:
+            l.append(new_path)
+    return l
+
+
+def PI(n, min_v, max_v):
+    l = []
+    d = {}
+    devide_integer(n, min_v, max_v, "", l, d)
+    return l
 
 def fabonich(n):
     if(n<0): return print("index error")
