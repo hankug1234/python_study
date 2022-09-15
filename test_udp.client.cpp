@@ -1,4 +1,6 @@
 #include<stdio.h>
+#include <sys/types.h>
+#include <Winsock2.h>
 
 using namespace std;
 
