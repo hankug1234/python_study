@@ -1,0 +1,37 @@
+import cv2
+from tqdm import tqdm
+from glob import glob
+
+import pandas as pd
+
+labels_path = glob("C:/hankug_work/hankug_coco2/labels/*.txt")
+image_path = "C:/hankug_work/hankug_coco2/images/"
+save_path = "C:/hankug_work/hankug_coco2/images_bbox/"
+
+category_name = ["car","person"]
+
+def yolo_style_to_bbox(yolo,image_size):
+    width = yolo[2]*image_size[0]
+    height = yolo[3]*image_size[1]
+    x = yolo[0]*image_size[0]
+    y = yolo[1]*image_size[1]
+
+    tl_x = (x*2-width)/2
+    tl_y = (y*2-height)/2
+    br_x = (x*2+width)/2
+    br_y = (y*2+height)/2
+
+    return [tl_x,tl_y,br_x,br_y]
+
+
+for label in tqdm(labels_path):
+    name = label.split("\\")[-1].split(".")[0]
+    data = pd.read_csv(label,header=None,sep=" ")
+    image = cv2.imread(image_path+name+".jpg")
+
+    for i in range(len(data.index)):
+        category = category_name[int(data.iloc[i].values[0])-1]
+        bbox = yolo_style_to_bbox(data.iloc[i].values[1:],(image.shape[1],image.shape[0]))
+        cv2.rectangle(image, (int(bbox[0]),int(bbox[1])), (int(bbox[2]),int(bbox[3])),color=(0, 255, 0), thickness=3)
+        cv2.putText(image, category, (int(bbox[0]),int(bbox[1])), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    cv2.imwrite(save_path+name+".jpg",image)
