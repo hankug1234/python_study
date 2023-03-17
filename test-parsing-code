@@ -1,0 +1,54 @@
+import json
+import pybboxes as pbx
+from tqdm import tqdm
+import pandas as pd
+#json_formatted_str = json.dumps(json_labels, indent=2)
+
+source_path = "C:/Users/USER/OneDrive/바탕 화면/hankug_work/hankug_coco2/annotations/instances_default.json"
+save_path = "C:/Users/USER/OneDrive/바탕 화면/hankug_work/hankug_coco2_labels"
+
+def coco_to_yolo_style(coco,image_size):
+    yolo = pbx.convert_bbox(coco, from_type = "coco", to_type = "yolo", image_size =image_size)
+    return [i for i in yolo]
+
+def convert_exec(file_name,exec):
+    name = file_name.split(".")
+    return name[0]+"."+exec
+
+def parsing_coco_data(save_path,source_path):
+
+    with open(source_path) as f:
+        json_labels = json.load(f)
+
+    images = json_labels["images"]
+    annotations = json_labels["annotations"]
+
+    annotations_dict = {}
+    images_size_dict = {}
+    image_labeltxt_name_list = {}
+    save_results = {}
+
+    for image in images:
+        id = image["id"]
+        images_size_dict[id] = [image["width"],image["height"]]
+        image_labeltxt_name_list[id] = convert_exec(image["file_name"],"txt")
+
+    for annotation in tqdm(annotations):
+        image_id = annotation["image_id"]
+        bbox = coco_to_yolo_style(annotation["bbox"],images_size_dict[image_id])
+        category_id = annotation["category_id"]
+        bbox.insert(0,category_id)
+        try:
+            annotations_dict[image_id].append(bbox)
+        except KeyError:
+            annotations_dict[image_id] = [bbox]
+
+    for image_id,image_per_objects in annotations_dict.items():
+        pandas_form = pd.DataFrame(image_per_objects)
+        save_results[save_path+"/"+image_labeltxt_name_list[image_id]] = pandas_form
+
+    for path,data in tqdm(save_results.items()):
+        data.to_csv(path,sep=" ",header=None,index=None)
+
+
+parsing_coco_data(save_path,source_path)
