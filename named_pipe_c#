@@ -1,0 +1,53 @@
+public async void write(string message)
+        {
+            NamedPipeClientStream PipeClientStream = new NamedPipeClientStream(".", "client_to_server", PipeDirection.InOut);
+
+            PipeClientStream.Connect();
+
+            var write = Encoding.UTF8.GetBytes(message);
+
+            await PipeClientStream.WriteAsync(write, 0, write.Length);
+
+            PipeClientStream.Flush();  
+            PipeClientStream.Close();
+        }
+
+        public async Task<string> read() {
+            NamedPipeClientStream PipeClientStream = new NamedPipeClientStream(".", "server_to_client", PipeDirection.InOut);
+            PipeClientStream.Connect();
+            var builder = new StringBuilder();
+
+            while (true){
+                byte[] buffer = new byte[1024];
+                int num = await PipeClientStream.ReadAsync(buffer, 0, buffer.Length);
+
+                builder.Append(Encoding.Default.GetString(buffer));
+
+                if (num == 0)
+                {
+                    break;
+                }
+            
+            }
+
+            await Task.Run(() => { 
+                 PipeClientStream.Close();
+            });
+
+            return builder.ToString();
+
+        }
+
+        public void start_pipe() {
+           var pipeClient = new NamedPipeClientStream(".", "test0", PipeDirection.InOut);
+           pipeClient.Connect();
+
+            using var sr = new StreamReader(pipeClient);
+            string? temp;
+            while ((temp = sr.ReadLine()) != null)
+            {
+                Console.WriteLine("Received from server: {0}", temp);
+            }
+
+            pipeClient.Close();
+        }
